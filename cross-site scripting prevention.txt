@@ -1,0 +1,71 @@
+**How to Prevent XSS**
+
+In this section, we'll describe some general principles for preventing cross-site scripting vulnerabilities and ways of using various common technologies for protecting against XSS attacks.
+
+Cross-site scripting prevention can generally be achieved via two layers of defense:
+
+**Encode data on output**
+**Validate input on arrival**
+
+You can use Burp Scanner to scan your web sites for numerous security vulnerabilities, including XSS. Burp's scanning logic replicates the actions of a skilled attacker, achieving high coverage of XSS vulnerabilities.
+
+**Encode Data on Output:**
+
+Encoding should be applied directly before user-controllable data is written to a page, based on the context.
+
+- In an HTML context, convert non-whitelisted values into HTML entities:
+  `<` converts to: `&lt;`
+  `>` converts to: `&gt;`
+
+- In a JavaScript string context, Unicode-escape non-alphanumeric values:
+  `<` converts to: `\u003c`
+  `>` converts to: `\u003e`
+
+Sometimes, multiple layers of encoding may be needed, in the correct order.
+
+**Validate Input on Arrival:**
+
+Input validation should be strict when data is first received from a user. Examples include:
+- Validating URLs to start with safe protocols like HTTP or HTTPS.
+- Ensuring numeric input contains an integer.
+- Validating input contains only expected characters.
+
+Input validation should employ whitelists rather than blacklists to block invalid input, making it less susceptible to attacks.
+
+**Allowing "Safe" HTML:**
+
+Allowing users to post HTML markup should be avoided. If necessary, use a JavaScript library like DOMPurify, but be vigilant for security updates.
+
+**Attacks Using Malicious CSS:**
+
+Be cautious with other content types like CSS, as they can also be harmful.
+
+**Preventing XSS Using a Template Engine:**
+
+Template engines like Twig and Freemarker define their own escaping systems. Review their escaping features when choosing a template engine.
+
+**Preventing XSS in PHP:**
+
+- Use `htmlentities` to encode entities in HTML context:
+  ```php
+  <?php echo htmlentities($input, ENT_QUOTES, 'UTF-8'); ?>
+
+For JavaScript string context, use a Unicode-escaping function.
+
+Preventing XSS Client-Side in JavaScript:
+
+Use custom HTML encoding functions in JavaScript for HTML context and Unicode-escaping for JavaScript string context.
+
+Preventing XSS in jQuery:
+
+Escaping user input passed to a jQuery selector is crucial to prevent XSS.
+
+Mitigating XSS Using Content Security Policy (CSP):
+
+CSP restricts external scripts and inline scripts, reducing the impact of XSS. Deploy CSP by setting the Content-Security-Policy header.
+
+An example CSP:
+
+default-src 'self'; script-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none';
+
+Whitelist external domains carefully and consider using hash- or nonce-based policies to load resources securely.
